@@ -14,6 +14,8 @@ import Privacy from './terms/Privacy';
 import Service from './terms/Service';
 import DeleteAccount from './DeleteAccount';
 import SignOut from './SignOut';
+import MainTabs from '../../navigation/Tab';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -25,9 +27,9 @@ const MainDrawer = () => {
         headerTransparent: true,
         headerBackVisible: false,
         headerShown: false,
-      })}>
-      {/* Nesting */}
-      <Drawer.Screen name="Home" component={Home} />
+      })}>      
+      {/* tab */}
+      <Drawer.Screen name="MainTabs" component={MainTabs} />
       {/* Information */}
       <Drawer.Screen name="Manual" component={Manual} />
       <Drawer.Screen name="Rule" component={Rule} />
