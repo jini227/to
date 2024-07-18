@@ -17,7 +17,6 @@ function App() {
         SplashScreen.hide();
     }, []);
 
-
     return (
         <NavigationContainer>
             <MainStack />
