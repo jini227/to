@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
-const MyPage = () => {
+const MyPage = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [searchResults, setSearchResults] = useState([
         { id: 1, username: 'user1', imageUrl: 'https://via.placeholder.com/150' },
@@ -26,20 +26,28 @@ const MyPage = () => {
         // Add more mock data as needed
     ]);
 
+    // 하드코딩된 사용자 데이터와 공개 여부 플래그
+    const user = {
+        username: 'user1',
+        profileImageUrl: 'https://via.placeholder.com/150', // 프로필 이미지 URL
+        posts: 165,
+        followers: 2624,
+        following: 1138,
+        job: '백엔드 개발자',
+        company: '삼성물산',
+        team: '혁신개발팀',
+        address: '강남구 어저구 저쩌구 354-1. 22층',
+        jobVisible: true,
+        companyVisible: true,
+        teamVisible: true,
+        addressVisible: true,
+    };
+
     const renderItem = ({ item }) => (
         <TouchableOpacity style={styles.itemContainer}>
             <FastImage source={{ uri: item.imageUrl }} style={styles.image} />
         </TouchableOpacity>
     );
-
-    // 하드코딩된 사용자 데이터
-    const user = {
-        username: 'User123',
-        profileImageUrl: 'https://via.placeholder.com/150', // 프로필 이미지 URL
-        posts: 100,
-        followers: 200,
-        following: 150,
-    };
 
     return (
         <View style={styles.container}>
@@ -47,7 +55,7 @@ const MyPage = () => {
             <View style={styles.profileInfo}>
                 <Image style={styles.profileImage} source={{ uri: user.profileImageUrl }} />
                 <View style={styles.profileText}>
-                    <Text style={styles.username}>{user.username}</Text>
+                    {/* <Text style={styles.username}>{user.username}</Text> */}
                     <View style={styles.statsContainer}>
                         <View style={styles.statContainer}>
                             <Text style={styles.stat}>{user.posts}</Text>
@@ -66,9 +74,10 @@ const MyPage = () => {
             </View>
             {/* 추가적인 마이페이지 정보 */}
             <View style={styles.extraInfo}>
-                {/* <Text style={styles.sectionTitle}>소개</Text> */}
-                <Text style={styles.sectionContent}>안녕하세요! 반갑습니다. 저는 React Native를 공부하고 있는 개발자입니다.</Text>
-                {/* 다른 섹션 추가 */}
+                {user.jobVisible && <Text style={styles.sectionContent}>직업: {user.job}</Text>}
+                {user.companyVisible && <Text style={styles.sectionContent}>회사: {user.company}</Text>}
+                {user.teamVisible && <Text style={styles.sectionContent}>소속팀: {user.team}</Text>}
+                {user.addressVisible && <Text style={styles.sectionContent}>직장주소: {user.address}</Text>}
             </View>
             <FlatList
                 data={searchResults}
@@ -105,11 +114,11 @@ const styles = StyleSheet.create({
     },
     profileText: {
         marginLeft: 20,
+        flex: 1, // 텍스트 영역이 남은 공간을 차지하도록 설정
     },
     username: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginLeft: 20,
     },
     statsContainer: {
         flexDirection: 'row',
@@ -118,12 +127,11 @@ const styles = StyleSheet.create({
     },
     statContainer: {
         alignItems: 'center',
+        flex: 1, // 각 stat 컨테이너가 동일한 너비를 가지도록 설정
     },
     stat: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginRight: 20,
-        marginLeft: 20,
     },
     statLabel: {
         fontSize: 16,
@@ -135,6 +143,7 @@ const styles = StyleSheet.create({
     },
     sectionContent: {
         fontSize: 16,
+        marginBottom: 10, // 항목 사이에 간격 추가
     },
     flatListContainer: {
         paddingVertical: 5,
