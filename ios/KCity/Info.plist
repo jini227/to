@@ -43,7 +43,7 @@
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>YOUR TEXT</string>
 	<key>NSCameraUsageDescription</key>
-	<string>YOUR TEXT</string>
+	<string>카메라 접근 권한 줘.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>YOUR TEXT</string>
 	<key>NSFaceIDUsageDescription</key>
@@ -62,9 +62,9 @@
 	<key>NSMotionUsageDescription</key>
 	<string>YOUR TEXT</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>YOUR TEXT</string>
+	<string>라이브러리 접근 권한 줘.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>YOUR TEXT</string>
+	<string>라이브러리 접근 권한 줘.</string>
 	<key>NSRemindersFullAccessUsageDescription</key>
 	<string>YOUR TEXT</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

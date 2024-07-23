@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Platform, Linking, Alert } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import Modal from 'react-native-modal';
+import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import ImageResizer from 'react-native-image-resizer';
+import ImagePicker from 'react-native-image-crop-picker';
+import DeviceInfo from 'react-native-device-info';
+import ActionSheet from '../../../components/ActionSheet';
 
 const MyPage = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
+    const [actionSheet, setActionSheet] = React.useState(false);
     const [searchResults, setSearchResults] = useState([
         { id: 1, username: 'user1', imageUrl: 'https://via.placeholder.com/150' },
         { id: 2, username: 'user2', imageUrl: 'https://via.placeholder.com/150' },
@@ -11,18 +18,18 @@ const MyPage = ({ navigation }) => {
         { id: 4, username: 'user4', imageUrl: 'https://via.placeholder.com/150' },
         { id: 5, username: 'user5', imageUrl: 'https://via.placeholder.com/150' },
         { id: 6, username: 'user6', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 1, username: 'user1', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 2, username: 'user2', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 3, username: 'user3', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 4, username: 'user4', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 5, username: 'user5', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 6, username: 'user6', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 1, username: 'user1', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 2, username: 'user2', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 3, username: 'user3', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 4, username: 'user4', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 5, username: 'user5', imageUrl: 'https://via.placeholder.com/150' },
-        { id: 6, username: 'user6', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 7, username: 'user1', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 8, username: 'user2', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 9, username: 'user3', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 10, username: 'user4', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 11, username: 'user5', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 12, username: 'user6', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 13, username: 'user1', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 14, username: 'user2', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 15, username: 'user3', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 16, username: 'user4', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 17, username: 'user5', imageUrl: 'https://via.placeholder.com/150' },
+        { id: 18, username: 'user6', imageUrl: 'https://via.placeholder.com/150' },
         // Add more mock data as needed
     ]);
 
@@ -49,8 +56,143 @@ const MyPage = ({ navigation }) => {
         </TouchableOpacity>
     );
 
+    const closeActionSheet = () => setActionSheet(false);
+
+    const actionItems = [
+        {
+            id: 1,
+            label: '카메라',
+            onPress: async () => {
+                try {
+                    let permission;
+                    if (Platform.OS === 'ios') {
+                        const result = await request(PERMISSIONS.IOS.CAMERA);
+                        permission = result === RESULTS.GRANTED;
+                    }
+                    if (Platform.OS === 'android') {
+                        const result = await request(PERMISSIONS.ANDROID.CAMERA);
+                        permission = result === RESULTS.GRANTED;
+                    }
+                    if (permission) {
+                        onCamera();
+                        return;
+                    }
+                    Alert.alert('이 앱은 카메라 접근 권한 허용이 필요합니다.', '앱 설정 화면을 열어서 권한을 확인해주세요.', [
+                        {
+                            text: '네',
+                            onPress: () => Linking.openSettings(),
+                        },
+                        {
+                            text: '아니오',
+                            onPress: () => closeActionSheet(),
+                            style: 'cancel',
+                        },
+                    ]);
+                } catch (e) {
+                    console.log('permission error ::: ', e);
+                }
+            },
+        },
+        {
+            id: 2,
+            label: '앨범',
+            onPress: async () => {
+                try {
+                    let permission;
+                    if (Platform.OS === 'ios') {
+                        const result = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+                        permission = result === RESULTS.GRANTED;
+                    }
+                    if (Platform.OS === 'android') {
+                        const result = Number(DeviceInfo.getSystemVersion()) <= 12 ? await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE) : await request(PERMISSIONS.ANDROID.READ_MEDIA_IMAGES);
+                        permission = result === RESULTS.GRANTED;
+                    }
+                    if (permission) {
+                        onGallery();
+                        return;
+                    }
+                    Alert.alert('이 앱은 앨범 접근 권한 허용이 필요합니다.', '앱 설정 화면을 열어서 권한을 확인해주세요.', [
+                        {
+                            text: '네',
+                            onPress: () => Linking.openSettings(),
+                        },
+                        {
+                            text: '아니오',
+                            onPress: () => closeActionSheet(),
+                            style: 'cancel',
+                        },
+                    ]);
+                } catch (e) {
+                    console.log('permission error ::: ', e);
+                }
+            },
+        },
+    ];
+
+    const onResponseCamera = async response => {
+        try {
+            const resizedImage = await ImageResizer.createResizedImage(response.path, 1280, 720, response.mime.includes('jp') ? 'JPEG' : 'PNG', 100, 0);
+            const name = response.path.split('/').pop();
+            const obj = {
+                name: name,
+                type: response.mime,
+                uri: Platform.OS === 'android' ? resizedImage.uri : resizedImage.uri.replace('file://', ''),
+            };
+            navigation.navigate('AddPost', { obj });
+        } catch (error) {
+            console.error('Error processing image', error);
+        }
+    };
+
+    const onResponseGallery = async response => {
+        const uploadPromises = response.map(async item => {
+            try {
+                const parts = item.path.split('/');
+                const name = parts[parts.length - 1];
+                const resizedImage = await ImageResizer.createResizedImage(item.path, 1280, 720, item.mime.includes('jp') ? 'JPEG' : 'PNG', 100, 0);
+
+                const obj = {
+                    name: name,
+                    type: item.mime,
+                    uri: Platform.OS === 'android' ? resizedImage.uri : resizedImage.uri.replace('file://', ''),
+                };
+                navigation.navigate('AddPost', { obj });
+            } catch (error) {
+                console.error('Error processing image', error);
+            }
+        });
+
+        await Promise.all(uploadPromises);
+    };
+
+    const onCamera = () => {
+        ImagePicker.openCamera({ mediaType: 'photo', includeBase64: true }).then(response => {
+            onResponseCamera(response);
+            closeActionSheet();
+        });
+    };
+
+    const onGallery = () => {
+        ImagePicker.openPicker({ multiple: true, mediaType: 'photo', includeBase64: true }).then(response => {
+            onResponseGallery(response);
+            closeActionSheet();
+        });
+    };
+
     return (
         <View style={styles.container}>
+            <Modal
+                statusBarTranslucent
+                isVisible={actionSheet}
+                style={styles.bottomModal}
+                useNativeDriver
+                hideModalContentWhileAnimating
+                onBackdropPress={closeActionSheet}
+                onBackButtonPress={closeActionSheet}
+            >
+                <ActionSheet actionItems={actionItems} onCancel={closeActionSheet} />
+            </Modal>
+
             {/* 상단 프로필 정보 */}
             <View style={styles.profileInfo}>
                 <Image style={styles.profileImage} source={{ uri: user.profileImageUrl }} />
@@ -88,7 +230,7 @@ const MyPage = ({ navigation }) => {
                 contentContainerStyle={styles.flatListContainer}
             />
             {/* + 아이콘 */}
-            <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddPost')}>
+            <TouchableOpacity style={styles.addButton} onPress={() => setActionSheet(true)}>
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
         </View>
@@ -181,6 +323,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    bottomModal: { margin: 0, justifyContent: 'flex-end' },
 });
 
 export default MyPage;
